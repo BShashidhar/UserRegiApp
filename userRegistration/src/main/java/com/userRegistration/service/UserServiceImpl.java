@@ -17,9 +17,9 @@ public class UserServiceImpl implements UserService {
 		return userRepository.insert(user);
 	}
 
-//	public User getUserById(Integer userId) {
-//		return userRepository.searchUserById(userId);
-//	}
+	public User getUserById(Integer userId) {
+		return userRepository.searchUserById(userId);
+	}
 	
 	public List<User> listAllUsers() {
 		return userRepository.findAll();

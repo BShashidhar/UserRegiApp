@@ -14,7 +14,7 @@ public class TestBoundary {
 	public void testUserPasswordLength() {
 		User user=SampleData.getUserDetails();
 		user.getUserPassword();
-		int passwordLength = 10;
+		int passwordLength = 9;
 		assertEquals(passwordLength, user.getUserPassword().length());
 	}
 
@@ -31,7 +31,7 @@ public class TestBoundary {
 	public void testAdminPasswordLength() {
 		Admin admin=SampleData.getAdminDetails();
 		admin.getAdminPassword();
-		int passwordLength = 10;
+		int passwordLength = 5;
 		assertEquals(passwordLength, admin.getAdminPassword().length());
 	}
 

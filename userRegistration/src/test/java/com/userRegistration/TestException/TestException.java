@@ -1,41 +1,44 @@
 package com.userRegistration.TestException;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
 
+import com.userRegistration.exception.UserAlreadyExistException;
+import com.userRegistration.exception.UserDoesNotExistException;
 import com.userRegistration.model.User;
-import com.userRegistration.service.LoginService;
-import com.userUegistration.exception.UserAlreadyExistException;
-import com.userUegistration.exception.UserDoesNotExistException;
+import com.userRegistration.service.LoginServiceImpl;
 
 import junit.framework.Assert;
 
 public class TestException {
+	@InjectMocks
+	private LoginServiceImpl loginServiceImpl;
 
-	@Test
-	public void testForUserRegistration() throws UserAlreadyExistException {
-		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
-		User user = new User();
-		user.setUserName("admin");
-		user.setUserPassword("james");
-		LoginService loginservice = (LoginService) context.getBean("LoginService");
-		loginservice.register(user);
-		Assert.assertEquals(UserAlreadyExistException.message, "user already exists !..please login");
-		context.close();	
-		
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
-	public void testForUserLogin() throws UserDoesNotExistException {
+	public void testForUserRegistration() throws UserAlreadyExistException {
 
-		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
 		User user = new User();
 		user.setUserName("admin");
 		user.setUserPassword("james");
-		LoginService loginservice = (LoginService) context.getBean(LoginService.class);
-		loginservice.login(user.getUserName(), user.getUserPassword());
+		loginServiceImpl.register(user);
+		Assert.assertEquals(UserAlreadyExistException.message, "user already exists !..please login");
+	}
+
+	@SuppressWarnings("deprecation")
+	@Test
+	public void testForUserLogin() throws UserDoesNotExistException {
+		User user = new User();
+		user.setUserName("admin");
+		user.setUserPassword("james");
+		loginServiceImpl.login(user.getUserName(), user.getUserPassword());
 		Assert.assertEquals(UserDoesNotExistException.message, "user already exists !..please login");
-		context.close();
 	}
 }

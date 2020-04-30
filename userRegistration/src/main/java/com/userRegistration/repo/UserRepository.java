@@ -4,6 +4,12 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.userRegistration.model.User;
 
-public interface UserRepository extends MongoRepository<User, Integer> {	
+public interface UserRepository extends MongoRepository<User, Integer> {
+
+	/**
+	 * @param userId
+	 * @return
+	 */
+	User searchUserById(Integer userId);
 	
 }

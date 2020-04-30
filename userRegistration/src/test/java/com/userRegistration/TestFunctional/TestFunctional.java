@@ -1,145 +1,103 @@
 package com.userRegistration.TestFunctional;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import com.userRegistration.SampleData.SampleData;
 import com.userRegistration.model.Admin;
 import com.userRegistration.model.User;
-import com.userRegistration.service.LoginService;
-import com.userRegistration.service.UserService;
-
-import in.flightTicketBooking.model.Flight;
-import in.flightTicketBooking.service.FlightService;
+import com.userRegistration.repo.AdminRepository;
+import com.userRegistration.repo.UserRepository;
+import com.userRegistration.service.AdminServiceImpl;
+import com.userRegistration.service.UserServiceImpl;
 
 public class TestFunctional {
+	@Mock
+	private UserRepository userRepository;
+	@Mock
+	private AdminRepository adminRepository;
+
+	@Mock
+	private User user;
+	@Mock
+	private Admin admin;
+
+	@InjectMocks
+	private UserServiceImpl userServiceImpl;
+
+	@InjectMocks
+	private AdminServiceImpl adminServiceImpl;
+
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+	}
 
 	@Test
 	public void testCreateUser() {
-		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
-		Admin admin=SampleData.getAdminDetails();
-		admin.getAdminPassword();
-
-		int userId = user.getUserId();
-
-		LoginService loginservice = (LoginService) context.getBean(LoginService.class);
-		boolean userfromdb = loginservice.register(user);
-		assertSame(userId, userfromdb);
-		context.close();
+		User user = SampleData.getUserDetails();
+		userServiceImpl.createUser(user);
+		verify(userRepository, times(1)).insert(user);
 	}
 
 	@Test
-	public void testGetUser() {
-		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
-		User user=SampleData.getUserDetails();
-		int userId = user.getUserId();
+	public void testCreateAdmin() {
+		Admin admin = SampleData.getAdminDetails();
+		adminServiceImpl.createAdmin(admin);
+		verify(adminRepository, times(1)).insert(admin);
+	}
 
-		UserService userservice = (UserService) context.getBean(UserService.class);
-		User userfromdb = userservice.getUser(user.getUserId());
-		assertSame(userId, userfromdb);
-		context.close();
+	@SuppressWarnings("static-access")
+	@Test
+	public void getUserByIdTest() {
+		when(userRepository.searchUserById(1)).thenReturn(new SampleData().getUserDetails());
+		User user = userServiceImpl.getUserById(1);
+		assertEquals(1, user.getUserId());
+		assertEquals("Shashidhar", user.getUserLastName());
+		assertEquals("shashi@gmail.com", user.getUserEmail());
 	}
 
 	@Test
-	public void testUpdateUser() {
-		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
-		User user = new User();
-		user.setUserId(1);
-		user.setUserName("admin");
-		user.setUserPassword("james");
+	public void getAllUsersTest() {
+		List<User> list = new ArrayList<User>();
+		User user1 = new User();
+		user1.setUserId(1);
+		user1.setUserFirstName("Besta");
+		user1.setUserLastName("Shashidhar");
+		user1.setUserName("B Shashidhar");
+		user1.setUserEmail("shashi@gmail.com");
+		user1.setUserPassword("123456789");
+		user1.setProfilePicture("google.com");
+		user1.isActive();
+		User user2 = new User();
+		user2.setUserId(2);
+		user2.setUserFirstName("Besta");
+		user2.setUserLastName("Shashidhar");
+		user2.setUserName("B Shashidhar");
+		user2.setUserEmail("shashi@gmail.com");
+		user2.setUserPassword("123456789");
+		user2.setProfilePicture("google.com");
+		user2.isActive();
 
-		int userId = user.getUserId();
+		list.add(user1);
+		list.add(user2);
 
-		UserService userservice = (UserService) context.getBean(UserService.class);
-		boolean isUpdated = userservice.updateUser(user);
-		assertSame(userId, isUpdated);
-		context.close();
-	}
+		when(userRepository.findAll()).thenReturn(list);
 
-	@Test
-	public void testDeleteUser() {
-		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
-		User user = new User();
-		user.setUserId(1);
-		
-		int userId = user.getUserId();
+		List<User> userList = userServiceImpl.listAllUsers();
 
-		UserService userservice = (UserService) context.getBean(UserService.class);
-		boolean isDelete = userservice.deleteUser(user);
-		assertSame(userId, isDelete);
-		context.close();
-	}
-
-	@Test
-	public void testCreateFlight() {
-		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
-		Flight flight = new Flight();
-		flight.setfId(1);
-		flight.setFlightNo("AP23AJ6869");
-		flight.setAirline("indigo");
-		flight.setFrom("indigo");
-		flight.setTo("indigo");
-		flight.setStartDateTime("2020/05/05");
-		flight.setEndDateTime("2020/05/05");
-		flight.setScheduledDay("All Days");
-		flight.setInstrumentUsed("Seat Tv");
-		flight.setTotalBussinessSeats(12);
-		flight.setTotalNonBussinessSeats(60);
-		flight.setTickateCost(3000);
-		flight.setNoOfRows("6");
-		flight.setNoOfColumns("60");
-		flight.setMeal("Non-Veg");
-
-		int fId = flight.getfId();
-
-		FlightService flightService = (FlightService) context.getBean(FlightService.class);
-		int flightFromDB = flightService.saveFlight(flight);
-		assertSame(fId, flightFromDB);
-		context.close();
-	}
-
-	@Test
-	public void testGetFlight() {
-		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
-		Flight flight = new Flight();
-		flight.setfId(1);
-
-		int fId = flight.getfId();
-
-		FlightService flightService = (FlightService) context.getBean(FlightService.class);
-		Flight flightFromDB = flightService.getFlight(flight.getFrom(), flight.getTo());
-		assertSame(fId, flightFromDB);
-		context.close();
-	}
-
-	@Test
-	public void testUpdateFlight() {
-		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
-		Flight flight = new Flight();
-		flight.setfId(1);
-
-		int fId = flight.getfId();
-
-		FlightService flightService = (FlightService) context.getBean(FlightService.class);
-		boolean isUpdated = flightService.updateFlight(flight);
-		assertSame(fId, isUpdated);
-		context.close();
-	}
-
-	@Test
-	public void testDeleteFlight() {
-		ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
-		Flight flight = new Flight();
-		flight.setfId(1);
-
-		int fId = flight.getfId();
-
-		FlightService flightService = (FlightService) context.getBean(FlightService.class);
-		boolean isDelete = flightService.deleteFlight(flight);
-		assertSame(fId, isDelete);
-		context.close();
+		assertEquals(2, userList.size());
+		verify(userRepository, times(1)).findAll();
 	}
 }
