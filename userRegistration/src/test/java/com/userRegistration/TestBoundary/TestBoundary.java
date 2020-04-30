@@ -11,6 +11,21 @@ import com.userRegistration.model.User;
 public class TestBoundary {
 
 	@Test
+	public void testUserFirstNameLength() {
+		User user=SampleData.getUserDetails();
+		user.getUserFirstName();
+		int userFirstName = 5;
+		assertEquals(userFirstName, user.getUserFirstName().length());
+	}
+	@Test
+	public void testUserLastNameLength() {
+		User user=SampleData.getUserDetails();
+		user.getUserLastName();
+		int userLastName = 10;
+		assertEquals(userLastName, user.getUserLastName().length());
+	}
+	
+	@Test
 	public void testUserPasswordLength() {
 		User user=SampleData.getUserDetails();
 		user.getUserPassword();
